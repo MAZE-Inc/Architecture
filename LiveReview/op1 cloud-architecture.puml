@@ -1,0 +1,65 @@
+@startuml kubernetes
+
+!include <gcp/GCPCommon>
+!include <gcp/Compute/Cloud_Functions>
+!include <gcp/Networking/Cloud_Firewall_Rules>
+!include <gcp/Compute/Compute_Engine>
+!include <gcp/Storage/Cloud_Storage>
+
+' Kubernetes
+' !include <k8s>
+!define KubernetesPuml https://raw.githubusercontent.com/dcasati/kubernetes-PlantUML/master/dist
+
+' global definition
+!includeurl KubernetesPuml/kubernetes_C4.puml
+!includeurl KubernetesPuml/kubernetes_Common.puml
+!includeurl KubernetesPuml/kubernetes_Container.puml
+!includeurl KubernetesPuml/kubernetes_Context.puml
+!includeurl KubernetesPuml/kubernetes_Simplified.puml
+!includeurl KubernetesPuml/OSS/all.puml
+
+KubernetesIng(lr_gateway, "인그래스", "")
+
+Cluster_Boundary(liveReview, "Live Review cluster for zzikda") {
+    Namespace_Boundary(zzikda, "찍다") {
+        Pod_Boundary(lr_core, "lr 코어") {
+            Service_Boundary(svcs, "서비스") {
+                KubernetesCronjob(analytic, "분석기", "1")
+                KubernetesCronjob(demography, "인구학", "2")
+                KubernetesCronjob(aaa, "aaa", "3")
+            }
+        }
+        Pod_Boundary(pv_pod, "pv pod") {
+            KubernetesPv(pv, "persistance volume", "5")
+        }
+        KubernetesPod(server, "서버", "3")
+    }
+}
+Cluster_Boundary(liveReview4callagain, "Live Review cluster for callagain") {
+    Namespace_Boundary(callagain, "또주문") {
+        Pod_Boundary(lr_core4callagain, "lr 코어") {
+            Service_Boundary(svcs4callagain, "서비스") {
+                KubernetesCronjob(analytic4callagain, "분석기", "1")
+                KubernetesCronjob(demography4callagain, "인구학", "2")
+                KubernetesCronjob(aaa4callagain, "aaa", "3")
+            }
+
+        }
+        Pod_Boundary(pv_pod4callagain, "pv pod") {
+            KubernetesPv(pv4callagain, "persistance volume", "5")
+        }
+        KubernetesPod(server4callagain, "서버", "3")
+    }
+}
+
+Rel_R(lr_core, pv, "dispatch")
+Rel_R(lr_core4callagain, pv4callagain, "dispatch")
+
+Rel_R(lr_core, lr_gateway, "fetch info.")
+Rel_R(lr_core4callagain, lr_gateway, "fetch info.")
+
+Rel_U(server, lr_gateway, "dispatch")
+Rel_U(server4callagain, lr_gateway, "dispatch")
+
+
+@enduml
