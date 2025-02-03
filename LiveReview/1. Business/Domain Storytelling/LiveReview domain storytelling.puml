@@ -1,0 +1,117 @@
+@startuml
+' !include https://raw.githubusercontent.com/johthor/DomainStory-PlantUML/main/domainStory.puml
+!include <DomainStory/domainStory>
+
+' Person Group System
+' Document Folder Call Email Conversation Info
+' Boundary
+
+Boundary(exhibition_boundary, Exhibition) {
+  Person(exhibition_host, Exhibition Host)
+  Person(exhibitor, Exhibitor)
+  ' Person(exhibition_view, Exhibition Viewer)
+  ' Person(exhibition_focus, Exhibition Focus)
+  ' Person(exhibition_visitor, Exhibition Visitor)
+  ' Person(exhibition_revisitor, Exhibition Revisitor)
+}
+
+Boundary(exhibition_biz_boundary, Exhibition Business) {
+  Document(exhibition_host_contract, Exhibition Host Contract)
+  Document(exhibitor_contract, Exhibitor Contract)
+}
+
+Boundary(exhibition_billing_boundary, Exhibition Billing) {
+  ' Conversation(service_info, Service Info)
+  Document(exhibition_host_invoice, Exhibition Host Invoice)
+  Document(exhibitor_invoice, Exhibitor Invoice)
+}
+
+Boundary(partner_billing_boundary, Partner Billing) {
+  ' Conversation(service_info, Service Info)
+  Document(partner_invoice, Partner Invoice)
+}
+
+Boundary(maze_boundary, Maze) {
+  Person(lr_biz_representative, LiveReview Business Representative)
+  Person(lr_biz_admin, LiveReview Business Admin)
+  Person(lr_service_representative, LiveReview Service Representative)
+  ' Person(lr_service_admin, LiveReview Service Admin)
+}
+
+Boundary(network_boundary, Network) {
+  Document(bbox, Boundary Box)
+}
+
+' Boundary(medium, Offline) {
+'   Document(aiot_physical_device, AIoT)
+' }
+
+Boundary(maze_livereview_aiot_boundary, LiveReview AIoT Platform) {
+  System(livereview_aiot, LiveReview AIoT)
+}
+
+Boundary(maze_livereview_boundary, LiveReview Platform) {
+  System(livereview_platform, LiveReview Platform)
+}
+
+Boundary(maze_finance_boundary, Maze Finance) {
+  System(maze_bank_account, Maze Bank Account)
+}
+
+Boundary(exhibition_service_boundary, Exhibition Services) {
+  Document(exhibition_service, Exhibition Service)
+}
+
+Boundary(saas_service_boundary, SaaS Services) {
+  Document(saas_service, SaaS Service)
+}
+
+Boundary(saas_biz_boundary, Saas Business) {
+  Document(partner_contract, Partner Contract)  
+}
+
+Boundary(saas_boundary, SaaS) {
+  Person(partner, Business Partner)
+  ' Person(franchise, Franchise)
+  ' Person(store, Franchise Store)
+  ' Person(customer, Store Customer)
+}
+
+' ''''''''''''''''''''''''''''''''''''''''''''''
+' business for exhibition host
+activity(_, exhibition_host, makes, exhibition_host_contract, with, lr_biz_representative)
+activity(_, livereview_platform, provides, exhibition_service, to, exhibition_host, <--, <--)
+
+activity(_, lr_biz_admin, sends, exhibition_host_invoice, to, exhibition_host, <--, <--)
+activity(_, exhibition_host, settles, exhibition_host_invoice, to, maze_bank_account)
+
+activity(_, exhibition_host, asks for setup of, aiot_physical_device, to, lr_service_representative)
+activity(_, lr_service_representative, sets up, aiot_physical_device, for, exhibition_host)
+
+' ''''''''''''''''''''''''''''''''''''''''''''''
+' business for exhibitor
+activity(_, exhibitor, makes, exhibitor_contract, with, lr_biz_representative)
+activity(_, livereview_platform, provides, exhibition_service, to, exhibitor, <--, <--)
+
+activity(_, lr_biz_admin, sends, exhibitor_invoice, to, exhibitor, <--, <--)
+activity(_, exhibitor, settles, exhibitor_invoice, to, maze_bank_account)
+
+activity(_, exhibitor, asks for setup of, livereview_aiot, to, lr_service_representative)
+activity(_, lr_service_representative, sets up, livereview_aiot, for, exhibitor)
+
+' ''''''''''''''''''''''''''''''''''''''''''''''
+' business for partner
+activity(_, partner, makes, partner_contract, with, lr_biz_representative, <--, <--)
+activity(_, livereview_platform, provides, saas_service, to, partner, -->, -->)
+
+activity(_, lr_biz_admin, sends, partner_invoice, to, partner, -->, -->)
+activity(_, partner, settles, partner_invoice, to, maze_bank_account)
+activity(_, partner, requsts, livereview_aiot, to, lr_service_representative)
+activity(_, lr_service_representative, sends, livereview_aiot, to, partner)
+
+' ''''''''''''''''''''''''''''''''''''''''''''''
+' internal interaction
+activity(_, livereview_aiot, send, bbox, to, livereview_platform)
+
+
+@enduml
